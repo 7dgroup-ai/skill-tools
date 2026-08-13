@@ -1,0 +1,5 @@
+# App 自动化（第 2 章 Skill-02）——需 Android 真机/模拟器
+# 安装：pip install uiautomator2 pytest
+# 首次连接设备：python -m uiautomator2 init（自动安装 atx-agent）
+uiautomator2>=3.0
+pytest>=8.0

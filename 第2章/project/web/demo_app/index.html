@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>sketch-store Demo 前端</title>
+  <style>
+    body { font-family: "PingFang SC","Microsoft YaHei",sans-serif; max-width: 640px; margin: 40px auto; }
+    input, button { padding: 8px 12px; margin: 4px; font-size: 14px; }
+    .error { color: #e11d48; min-height: 18px; }
+    .card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin: 8px 0; }
+    .order_id { color: #16a34a; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>sketch-store Demo 前端</h1>
+  <div>
+    <input id="username" placeholder="用户名" value="u_1001" />
+    <input id="password" type="password" placeholder="密码" value="pass_1001" />
+    <button id="login">登录</button>
+  </div>
+  <div class="error" id="error"></div>
+
+  <h2>商品</h2>
+  <div id="goods"></div>
+
+  <h2>购物车 <span id="cart_size">(0)</span></h2>
+  <button id="checkout">结算</button>
+  <div id="order_result"></div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    async function api(path, opts = {}) {
+      const resp = await fetch(path, { credentials: "same-origin",
+        headers: { "Content-Type": "application/json" }, ...opts });
+      return resp.json();
+    }
+
+    $("login").onclick = async () => {
+      const r = await api("/api/login", { method: "POST",
+        body: JSON.stringify({ username: $("username").value, password: $("password").value }) });
+      if (r.code !== 0) { $("error").textContent = r.msg; return; }
+      $("error").textContent = "登录成功";
+      loadGoods();
+    };
+
+    async function loadGoods() {
+      const r = await api("/api/goods");
+      $("goods").innerHTML = r.data.items.map((g) =>
+        `<div class="card">${g.name} ¥${g.price}
+           <button data-goods="${g.id}">加入购物车</button></div>`).join("");
+      document.querySelectorAll("button[data-goods]").forEach((btn) => {
+        btn.onclick = async () => {
+          const res = await api("/api/cart/add", { method: "POST",
+            body: JSON.stringify({ goods_id: btn.dataset.goods, num: 1 }) });
+          $("cart_size").textContent = `(${res.data.cart_size})`;
+        };
+      });
+    }
+
+    $("checkout").onclick = async () => {
+      const r = await api("/api/checkout", { method: "POST", body: "{}" });
+      $("order_result").textContent = r.code === 0 ? `下单成功：` : r.msg;
+      $("order_result").innerHTML = r.code === 0
+        ? `下单成功：<span class="order_id">${r.data.order_id}</span>` : r.msg;
+      $("cart_size").textContent = "(0)";
+    };
+
+    loadGoods();
+  </script>
+</body>
+</html>
