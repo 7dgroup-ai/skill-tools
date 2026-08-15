@@ -1,0 +1,55 @@
+name: order_flow
+description: "登录 → 加购 → 查购物车 → 预览 → 建单 → 支付 → 查单（sketch-store 8 步链路核心段）"
+base_url: http://localhost:8000
+vars:
+  user: u_1001
+  password: pass_1001
+  goods_id: g_2001
+
+setup:
+  - action: {delay_ms: 0}
+
+steps:
+  - name: login
+    request:
+      path: /api/login
+      method: POST
+      body: {username: "${user}", password: "${password}"}
+    extract:
+      token: {path: "$.data.token", method: jsonpath}
+    assert: {http_ok: true, biz_code: 0}
+
+  - name: add_to_cart
+    request:
+      path: /api/cart/add
+      method: POST
+      body: {goods_id: "${goods_id}", num: 1}
+    retry: {times: 2, on: [429, 503]}
+    assert: {http_ok: true, biz_code: 0}
+
+  - name: preview_order
+    request:
+      path: /api/order/preview
+      method: POST
+      body: {}
+    extract:
+      order_id: {path: "$.data.order_id", method: jsonpath}
+    assert: {http_ok: true, biz_code: 0}
+
+  - name: pay_order
+    request:
+      path: /api/order/pay
+      method: POST
+      body: {order_id: "${order_id}", pay_type: mock}
+    assert: {http_ok: true, biz_code: 0}
+
+  - name: query_order
+    request:
+      path: /api/order/${order_id}
+      method: GET
+    assert:
+      http_ok: true
+      biz_code: 0
+
+teardown:
+  - action: {delay_ms: 0}

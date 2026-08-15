@@ -1,0 +1,12 @@
+httpx>=0.27
+pydantic>=2.5
+PyYAML>=6.0
+jsonschema>=4.20
+fastapi>=0.110
+uvicorn>=0.29
+pytest>=8.0
+
+# 可选依赖（按需安装）：
+# gRPC 客户端（clients/grpc_client.py）     -> grpcio>=1.60 protobuf
+# WebSocket 客户端（clients/ws_client.py）  -> websockets>=12
+# 契约测试（contract/pact_consumer.py）      -> pact-python

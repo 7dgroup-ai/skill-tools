@@ -1,0 +1,18 @@
+name: login_flow
+description: "登录取 token，校验响应结构"
+base_url: http://localhost:8000
+vars:
+  username: ${user}
+  password: ${password}
+
+steps:
+  - name: login
+    request:
+      path: /api/login
+      method: POST
+      body: {username: "${user}", password: "${password}"}
+    extract:
+      token: {path: "$.data.token", method: jsonpath}
+    assert:
+      http_ok: true
+      biz_code: 0
