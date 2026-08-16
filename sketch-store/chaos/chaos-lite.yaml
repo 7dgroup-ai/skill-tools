@@ -1,0 +1,38 @@
+# 单机混沌实验（对齐设计手稿 chaos/chaos-lite.yaml）
+# 用法: chaostoolkit run chaos/chaos-lite.yaml
+# 无 chaostoolkit 时，可手动执行 stress / kill 演示等价效果：
+#   CPU:   stress --cpu 2 --timeout 60
+#   进程杀: kill <sketch-store pid>
+version: 1.0.0
+title: "sketch-store 单机韧性实验"
+description: "验证支付接口在 CPU 打满 / 进程被杀后的成功率与恢复"
+steady-state-hypothesis:
+  title: "支付链路可达且成功率 > 99%"
+  probes:
+    - type: probe
+      name: "pay-sanity"
+      provider:
+        type: http
+        url: "http://localhost:8000/health"
+        method: GET
+      tolerance: 200
+method:
+  - type: action
+    name: "cpu-load-60s"
+    provider:
+      type: process
+      path: stress
+      arguments: "--cpu 2 --timeout 60"
+  - type: action
+    name: "kill-app-30s"
+    provider:
+      type: process
+      path: pkill
+      arguments: "-f uvicorn"
+rollbacks:
+  - type: action
+    name: "restart-app"
+    provider:
+      type: process
+      path: sh
+      arguments: "-c 'nohup uvicorn app.main:app --port 8000 >> logs/app.log 2>&1 &'"

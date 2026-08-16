@@ -1,0 +1,17 @@
+services:
+  app:
+    build: .
+    container_name: sketch-store
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_FILE=/app/data/mall.db
+      - SKETCH_SECRET=sketch-store-dev-secret
+    volumes:
+      - ./data:/app/data
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
