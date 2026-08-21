@@ -1,0 +1,26 @@
+# project/scenarios/stability.yaml
+# 稳定性场景：容量场景最大 TPS（100%）持续，覆盖运维周期
+# 时长 = max(业务量÷TPS, 运维周期) + 预热 15min + 冷却 10min
+# 执行：bash run_scenario.sh stability.yaml
+
+name: stability_shopping_flow
+type: stability                   # 核心四类
+target: shopping_flow
+protocol: http
+
+# 使用容量场景确定的最大稳定 TPS 对应的 VU 数
+# 假设容量拐点在 500 VU → 270 TPS
+vus: 500
+ramp: 300s                        # 预热 5 min 慢速爬坡
+duration: 14400s                  # 4 小时（含预热/冷却，生产按运维周期计算）
+
+# 长跑 SLO（更严）
+slo:
+  error_rate_lt: 0.005
+  p95_ms_lt: 500
+  no_restart: true
+  memory_no_linear_growth: true
+
+monitor: [app_metrics, os_metrics, db_metrics, redis_metrics, mq_metrics, gc_metrics]
+
+pass_when: "0 错误、0 重启、内存不线性增长、错误率 < 0.5%"

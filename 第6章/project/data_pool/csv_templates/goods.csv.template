@@ -1,0 +1,8 @@
+goodsId
+1
+2
+3
+4
+5
+# ... 扩展到 1000 行（铺底）或 2400 行（容量场景）
+# 生产环境脱敏导出：SELECT id AS goodsId FROM pms_product WHERE publish_status=1 AND verify_status=1 LIMIT 1000;

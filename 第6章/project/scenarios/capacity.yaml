@@ -1,0 +1,44 @@
+# project/scenarios/capacity.yaml
+# 容量场景：全业务混合按比例、阶梯加压，摸边界
+# 执行：bash run_scenario.sh capacity.yaml
+
+name: capacity_shopping_flow
+type: capacity                    # 核心四类
+target: shopping_flow
+protocol: http
+
+# 业务混合比例（基于生产日志统计，§2.2）
+business_mix:
+  goods_list: 0.20
+  login: 0.15
+  add_cart: 0.25
+  cart_list: 0.10
+  order_preview: 0.10
+  order_create: 0.10
+  order_pay: 0.05
+  order_query: 0.05
+
+# 阶梯加压（各档 10 min）
+stages:
+  - vus: 100
+    ramp: 60s
+    duration: 10m
+  - vus: 500
+    ramp: 60s
+    duration: 10m
+  - vus: 1000
+    ramp: 60s
+    duration: 10m
+  - vus: 2000
+    ramp: 60s
+    duration: 10m
+
+# SLO（§5.3.2：满足 SLO 的最大混合吞吐；突破 SLO 即拐点）
+slo:
+  error_rate_lt: 0.005
+  p95_ms_lt: 500
+  tps_ge: 270                     # 本地减配目标 ≈ 270 TPS（生产 2666）
+
+monitor: [app_metrics, os_metrics, db_metrics, redis_metrics, mq_metrics]
+
+pass_when: "满足 SLO 的最大混合吞吐；突破 SLO 即记拐点"

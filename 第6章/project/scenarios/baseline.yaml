@@ -1,0 +1,38 @@
+# project/scenarios/baseline.yaml
+# 基准场景：单接口阶梯加压，建立标尺
+# 执行：bash run_scenario.sh baseline.yaml
+
+name: baseline_shopping_flow
+type: baseline                    # 核心四类：baseline/capacity/stability/abnormal
+target: shopping_flow             # 对应脚本资产库
+protocol: http
+
+# 阶梯加压（单接口，各档 5 min）
+stages:
+  - vus: 10
+    ramp: 30s
+    duration: 5m
+  - vus: 50
+    ramp: 30s
+    duration: 5m
+  - vus: 100
+    ramp: 30s
+    duration: 5m
+  - vus: 200
+    ramp: 30s
+    duration: 5m
+  - vus: 400
+    ramp: 30s
+    duration: 5m
+
+# SLO 熔断线（§5.3.1：错误率>1% / p95>1s / 资源熔断 即记拐点）
+slo:
+  error_rate_lt: 0.01
+  p95_ms_lt: 1000
+  tps_ge: 27                      # 本地减配容量目标 ≈ 27 TPS（生产 2666 ÷ 100）
+
+# 监控绑定（第 5 章 §5.4）
+monitor: [app_metrics, os_metrics]
+
+# 一句话判定
+pass_when: "上一档 = 极限 TPS；同负载连续 3 次 p95 波动 < ±5%"

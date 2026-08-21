@@ -1,0 +1,26 @@
+# project/scenarios/config.yaml
+# 配置场景（专项）：调优前后对比，验证改动收益
+# 执行：bash run_scenario.sh config.yaml
+
+name: config_shopping_flow
+type: config                      # 专项场景（不属于四类方法论）
+target: shopping_flow
+protocol: http
+
+# 同负载、同脚本、控制变量（仅调整被测系统配置）
+# 例如：JVM -Xmx4g → -Xmx8g、数据库连接池 50 → 100、Redis maxmemory 2g → 4g
+vus: 500                          # 固定在容量场景 80% 稳定压力
+ramp: 60s
+duration: 300s                    # 各 5 min
+
+# 对比基线（来自 baseline.yaml 结果）
+baseline_ref: "baseline_20260804_1030"
+
+slo:
+  tps_improve_ge: 0.10            # 关键指标提升 ≥ 10%
+  rt_p95_improve_ge: 0.10
+  error_rate_not_worse: true
+
+monitor: [app_metrics, os_metrics, jvm_metrics, db_metrics]
+
+pass_when: "关键指标提升 ≥ 10% 且不回退"

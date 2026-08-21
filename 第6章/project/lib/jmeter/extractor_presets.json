@@ -1,0 +1,30 @@
+{
+  "extractors": [
+    {
+      "name": "token",
+      "jsonPath": "$.data.token",
+      "matchNo": 1,
+      "defaultValue": "NOT_FOUND",
+      "applyTo": "both",
+      "computeConcurrency": true,
+      "description": "登录响应提取 token，注入 Authorization: Bearer ${token}"
+    },
+    {
+      "name": "orderId",
+      "jsonPath": "$.data.order_id",
+      "matchNo": 1,
+      "defaultValue": "NOT_FOUND",
+      "applyTo": "both",
+      "computeConcurrency": true,
+      "description": "预览单响应提取 orderId，建单/支付/查单引用 ${orderId}"
+    },
+    {
+      "name": "csrfToken",
+      "regex": "<input name=\"_csrf\" type=\"hidden\" value=\"(.+?)\" />",
+      "template": "$1$",
+      "matchNo": 1,
+      "defaultValue": "NOT_FOUND",
+      "description": "Spring Security CSRF 表单提取（HTML 页面）"
+    }
+  ]
+}

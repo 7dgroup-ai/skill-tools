@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6">
+  <hashTree>
+    <!-- 公共 Header 配置片段：通过 Include Controller 或 Module Controller 引用 -->
+    <HeaderManager guiclass="HeaderPanelGui" testclass="HeaderManager" testname="Common Headers" enabled="true">
+      <collectionProp name="HeaderManager.headers">
+        <elementProp name="" elementType="Header">
+          <stringProp name="Header.name">Content-Type</stringProp>
+          <stringProp name="Header.value">application/json</stringProp>
+        </elementProp>
+        <elementProp name="" elementType="Header">
+          <stringProp name="Header.name">Accept-Encoding</stringProp>
+          <stringProp name="Header.value">gzip, deflate</stringProp>
+        </elementProp>
+        <elementProp name="" elementType="Header">
+          <stringProp name="Header.name">Accept</stringProp>
+          <stringProp name="Header.value">application/json</stringProp>
+        </elementProp>
+        <elementProp name="" elementType="Header">
+          <stringProp name="Header.name">Connection</stringProp>
+          <stringProp name="Header.value">keep-alive</stringProp>
+        </elementProp>
+        <!-- 压测标记（全链路隔离） -->
+        <elementProp name="" elementType="Header">
+          <stringProp name="Header.name">dunshan</stringProp>
+          <stringProp name="Header.value">7DGroup</stringProp>
+        </elementProp>
+        <elementProp name="" elementType="Header">
+          <stringProp name="Header.name">User-Agent</stringProp>
+          <stringProp name="Header.value">Replayed-by-Gor</stringProp>
+        </elementProp>
+      </collectionProp>
+    </HeaderManager>
+    <hashTree/>
+  </hashTree>
+</jmeterTestPlan>

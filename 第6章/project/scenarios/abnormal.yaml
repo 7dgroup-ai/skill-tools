@@ -1,0 +1,55 @@
+# project/scenarios/abnormal.yaml
+# 异常场景：50% 最大容量 TPS 背景 + 故障注入
+# 执行：bash run_scenario.sh abnormal.yaml
+
+name: abnormal_shopping_flow
+type: abnormal                    # 核心四类
+target: shopping_flow
+protocol: http
+
+# 背景压力：容量场景最大稳定 TPS 的 50%
+background_vus: 250
+ramp: 60s
+duration: 1800s                   # 单次故障 10-30 min，这里 30 min
+
+# 故障注入清单（逐个执行，间隔 5 min 观察恢复）
+faults:
+  - name: kill_one_app_pod
+    type: pod_kill
+    target: sketch-store-app
+    count: 1
+    duration: 30s
+  - name: kill_one_db_pod
+    type: pod_kill
+    target: sketch-store-mysql
+    count: 1
+    duration: 30s
+  - name: network_partition
+    type: network_partition
+    target: sketch-store-app
+    latency_ms: 200
+    loss_percent: 5
+    duration: 60s
+  - name: cpu_stress
+    type: cpu_stress
+    target: sketch-store-app
+    workers: 2
+    load_percent: 80
+    duration: 60s
+  - name: slow_sql
+    type: slow_query
+    target: sketch-store-mysql
+    query_pattern: "SELECT.*FROM.*order"
+    delay_ms: 500
+    duration: 60s
+
+# 恢复判定：注入结束 5 min 内指标回基线（背景标准方差 ≤ 5%）
+recovery_window: 300s
+slo:
+  error_rate_lt: 0.01
+  p95_ms_lt: 1000
+  background_stddev_le: 0.05
+
+monitor: [app_metrics, os_metrics, k8s_events]
+
+pass_when: "注入结束 5 min 内指标回到基线（背景标准方差 ≤ 5%）"

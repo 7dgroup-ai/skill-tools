@@ -1,0 +1,8 @@
+userId,password
+u001,pass-1
+u002,pass-1
+u003,pass-1
+u004,pass-1
+u005,pass-1
+# ... 扩展到 500 行（铺底）或 2400 行（容量场景）
+# 生产环境脱敏导出：SELECT CONCAT('u',LPAD(id,3,'0')) AS userId, 'pass-1' AS password FROM ums_member WHERE status=1 LIMIT 500;

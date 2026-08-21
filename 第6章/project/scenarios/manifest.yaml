@@ -1,0 +1,26 @@
+# project/scenarios/manifest.yaml
+# 场景 ↔ 脚本映射登记（脚本资产的一部分）
+
+- script: shopping_flow.jmx
+  tool: jmeter
+  business: "商品列表→登录→加购→查车→预览→建单→支付→查单"
+  scenarios: [baseline, capacity, stability, abnormal, stress, config]
+  data_deps: [users.csv, goods.csv]
+  domain: order_flow
+  version: 1.0.0
+
+- script: shopping_flow.js
+  tool: k6
+  business: "商品列表→登录→加购→查车→预览→建单→支付→查单"
+  scenarios: [baseline, capacity, stability, abnormal, stress, config]
+  data_deps: [users.json, goods.json]
+  domain: order_flow
+  version: 1.0.0
+
+- script: locustfile.py
+  tool: locust
+  business: "商品列表→登录→加购→查车→预览→建单→支付→查单"
+  scenarios: [baseline, capacity, stability, abnormal]
+  data_deps: [users.csv, goods.csv]
+  domain: order_flow
+  version: 1.0.0

@@ -1,0 +1,30 @@
+# project/scenarios/stress.yaml
+# 压力场景（专项）：超设计上限，验证保护机制
+# 执行：bash run_scenario.sh stress.yaml
+
+name: stress_shopping_flow
+type: stress                      # 专项场景（不属于四类方法论）
+target: shopping_flow
+protocol: http
+
+# 超过容量场景 SLO 目标 TPS（如容量拐点 270 TPS → 压 400+ TPS）
+stages:
+  - vus: 1000
+    ramp: 30s
+    duration: 2m
+  - vus: 2000
+    ramp: 30s
+    duration: 2m
+  - vus: 4000
+    ramp: 30s
+    duration: 2m
+
+# 关键指标：限流/熔断触发、是否雪崩、恢复时间
+slo:
+  circuit_breaker_triggered: true
+  no_cascade_failure: true
+  recovery_time_lt: 60s           # 熔断后 60s 内恢复
+
+monitor: [app_metrics, sentinel_metrics, gateway_metrics]
+
+pass_when: "有保护生效且恢复后无雪崩"
